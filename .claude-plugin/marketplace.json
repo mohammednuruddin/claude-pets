@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "claude-pets",
+  "version": "1.0.0",
+  "description": "Pets that live above the Claude Code prompt and act out what Claude is doing, plus a prompt-cache meter.",
+  "owner": {
+    "name": "Nuru"
+  },
+  "plugins": [
+    {
+      "name": "pets",
+      "description": "Four faceless pets in starlight line art above the prompt: they read, plant, dig, fetch and fly along with Claude, panic at risky commands, raise young ones for helper agents, and sleep between turns.",
+      "version": "1.0.0",
+      "source": "./plugins/pets",
+      "category": "productivity"
+    },
+    {
+      "name": "prompt-cache-control",
+      "description": "Prompt-cache meter under the pets: hit rate, read/wrote/new tokens, a countdown to the cache's expiry, and your 5-hour and weekly plan windows. By Daniel Avila (claude-code-templates, MIT), with small changes so it sits under the pets.",
+      "version": "0.1.0",
+      "source": "./plugins/prompt-cache-control",
+      "category": "observability"
+    }
+  ]
+}

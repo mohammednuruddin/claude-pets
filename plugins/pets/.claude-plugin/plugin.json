@@ -1,0 +1,9 @@
+{
+  "name": "pets",
+  "version": "0.1.0",
+  "description": "Four faceless pets live on the prompt input: they play while Claude works, cheer when it answers, and nap while you think.",
+  "types": "./types/index.d.ts",
+  "author": {
+    "name": "Nuru"
+  }
+}
