@@ -19,13 +19,8 @@
     "ttl": {
       "type": "string",
       "title": "Cache lifetime",
-      "description": "How long the cache lives after a request: auto follows Claude Code's own rules (FORCE_PROMPT_CACHING_5M, CLAUDE_CODE_PROMPT_CACHE_TTL, the promptCacheTtl setting, ENABLE_PROMPT_CACHING_1H, then 1 hour on a Claude subscription and 5 minutes on an API key, cloud provider or usage credits) and corrects itself from request timing; 5m or 1h pins it",
-      "default": "auto",
-      "options": [
-        "auto",
-        "5m",
-        "1h"
-      ]
+      "description": "How long the cache lives after a request: \"auto\" follows Claude Code's own rules and corrects itself from request timing; \"5m\" or \"1h\" pins it. Anything else counts as auto.",
+      "default": "auto"
     },
     "warnSeconds": {
       "type": "number",
