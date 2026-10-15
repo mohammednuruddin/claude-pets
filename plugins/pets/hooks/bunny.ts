@@ -23,8 +23,11 @@ const hindLeg = (side: 'n' | 'f', dx: number): Bone[] => {
   const layer = side === 'n' ? 'near' : 'far'
   return [
     { id: `${side}hu`, parent: 'p', joint: shift(HIP, dx), shapes: [{ d: capsule(shift(HIP, dx), shift(KNEE, dx), 4.2, 2.5), layer, hasEdge: true }] },
+    // The body sits low over the legs: the lower leg is folded away under it,
+    // as a crouching rabbit's is, but the long foot and the front leg get an
+    // edge drawn over the body's fill, or only the thigh would show.
     { id: `${side}hl`, parent: `${side}hu`, joint: shift(KNEE, dx), shapes: [{ d: capsule(shift(KNEE, dx), shift(HOCK, dx), 1.9, 1.5), layer }] },
-    { id: `${side}hf`, parent: `${side}hl`, joint: shift(HOCK, dx), shapes: [{ d: capsule(shift(HOCK, dx), shift(HIND_TOE, dx), 1.6, 1.5), layer }] },
+    { id: `${side}hf`, parent: `${side}hl`, joint: shift(HOCK, dx), shapes: [{ d: capsule(shift(HOCK, dx), shift(HIND_TOE, dx), 1.6, 1.5), layer, hasEdge: true }] },
   ]
 }
 
@@ -32,8 +35,8 @@ const foreLeg = (side: 'n' | 'f', dx: number): Bone[] => {
   const layer = side === 'n' ? 'near' : 'far'
   return [
     { id: `${side}fu`, parent: 'c', joint: shift(SHOULDER, dx), shapes: [{ d: capsule(shift(SHOULDER, dx), shift(ELBOW, dx), 2.4, 1.7), layer, hasEdge: true }] },
-    { id: `${side}fl`, parent: `${side}fu`, joint: shift(ELBOW, dx), shapes: [{ d: capsule(shift(ELBOW, dx), shift(WRIST, dx), 1.5, 1.3), layer }] },
-    { id: `${side}ff`, parent: `${side}fl`, joint: shift(WRIST, dx), shapes: [{ d: capsule(shift(WRIST, dx), shift(FORE_TOE, dx), 1.3, 1.45), layer }] },
+    { id: `${side}fl`, parent: `${side}fu`, joint: shift(ELBOW, dx), shapes: [{ d: capsule(shift(ELBOW, dx), shift(WRIST, dx), 1.5, 1.3), layer, hasEdge: true }] },
+    { id: `${side}ff`, parent: `${side}fl`, joint: shift(WRIST, dx), shapes: [{ d: capsule(shift(WRIST, dx), shift(FORE_TOE, dx), 1.3, 1.45), layer, hasEdge: true }] },
   ]
 }
 

@@ -407,11 +407,14 @@ export const register: Register = on => {
     return (
       <Box flexDirection="column">
         <Svg source={petsScene(input)} alt={petsAlt(input)} />
-        {/* A dim star under each pet: its tap target. The desktop passes
-            presses to Buttons, and to nothing else on the band. */}
+        {/* Each pet's tap target: a hover scope over the pet, which shows a
+            small star on it under the pointer. The desktop passes presses
+            to Buttons and to nothing else on the band, so the star is one. */}
         {(Object.keys(PET_HOMES) as PetId[]).map(pet => (
-          <Box key={`at-${pet}`} position="absolute" top={2} left={Math.round(PET_HOMES[pet] * e.props.bodyColumns) - 1}>
-            <Button key={`tap-${pet}`} label="✦" plain dimColor onPress={() => {}} />
+          <Box key={`pet-${pet}`} position="absolute" top={0} left={Math.round(PET_HOMES[pet] * e.props.bodyColumns) - 3} width={7} height={3} justifyContent="center" alignItems="center">
+            <Box display="none" hover={{ display: 'flex' }}>
+              <Button key={`tap-${pet}`} label="✦" plain onPress={() => {}} />
+            </Box>
           </Box>
         ))}
         <Box position="absolute" top={0} right={0} flexDirection="row" gap={1}>

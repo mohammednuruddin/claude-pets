@@ -21,14 +21,7 @@ Code prompt and act out what Claude is doing.
 - `/pets` hides and shows the band. `/wrapped` draws the session as one card
   and saves it to ~/Downloads.
 
-## Install from the marketplace
-
-```sh
-claude plugin marketplace add mohammednuruddin/claude-pets
-claude plugin install pets@claude-pets
-```
-
-## Install from the zip
+## Install
 
 Needs Claude Code 2.1.287 or later, in the desktop app (the band is drawn
 there; the terminal gets no picture).
@@ -41,8 +34,10 @@ so that `~/.claude/skills/pets/` exists, then restart Claude Code. The mod
 loads in every session. To check it: `claude plugin validate ~/.claude/skills/pets`
 and `claude plugin test ~/.claude/skills/pets`.
 
-The `prompt-cache-control` plugin in the same marketplace draws its cache
-row under the animals.
+The zip also holds `prompt-cache-control`, the open-source cache meter from
+claude-code-templates (MIT), with small local changes so the two bands stack
+and the countdown only redraws once a minute. Drop it next to `pets` for the
+cache row under the animals; leave it out if you do not want it.
 
 The pets are faceless on purpose: no eyes, mouths or noses, by the owner's
 faith constraint. Please keep them that way if you change the art.
