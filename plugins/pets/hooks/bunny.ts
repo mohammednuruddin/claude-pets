@@ -128,11 +128,13 @@ const twitch = (t: number, period: number) => {
 
 // ------------------------------------------------------------- the hop
 
-// One hop of `distance` px forward over `seconds`, from crouch to crouch:
-// the body dips, the hind legs drive it up and forward (heels lifting off
-// the ground as the legs straighten), the front legs reach and land first,
-// the body rocks over them, and the hind feet swing in to land just behind
-// the front paws; the ears trail on the rise and flop forward on landing.
+// One hop of `distance` px forward over `seconds`, from crouch to crouch,
+// as a rabbit does it: the body dips, the hind legs drive it up and forward
+// with the heels lifting off the planted toes, then in flight the hind legs
+// stretch straight out behind the body and the front legs reach ahead; the
+// front paws land first, the body rocks over them, and the hind legs swing
+// forward under the body to land folded; the ears trail on the rise and
+// flop forward on landing.
 export const hopFrame = (u: number, from: number, distance: number, base: Pose = CROUCH, facing = 1): Pose & { x: number } => {
   const to = from + distance
   const x = from + distance * smooth(span(u, 0.16, 0.82))
@@ -145,23 +147,52 @@ export const hopFrame = (u: number, from: number, distance: number, base: Pose =
     u < 0.66 ? lerp(-2, 13, span(u, 0.5, 0.66)) :
     u < 0.82 ? lerp(13, 2, span(u, 0.66, 0.82)) :
     lerp(2, 0, span(u, 0.82, 1))
-  // Hind feet: planted (heel rising) until lift-off, trail, swing in, land.
-  const hindAirborne = span(u, 0.3, 0.78)
-  const hindWorld = u < 0.3 ? from : lerp(from, to, smooth(hindAirborne))
-  const hindY = u < 0.3 || u > 0.78 ? 0 : -4 * Math.sin(Math.PI * hindAirborne)
-  const heel = u < 0.16 ? FLAT : u < 0.3 ? lerp(FLAT, 72, span(u, 0.16, 0.3)) : u < 0.5 ? lerp(72, 120, span(u, 0.3, 0.5)) : u < 0.78 ? lerp(120, FLAT, span(u, 0.5, 0.78)) : FLAT
-  // Front paws: lift as the body rises, reach forward, land first.
-  const foreAirborne = span(u, 0.22, 0.64)
-  const foreWorld = u < 0.22 ? from : lerp(from, to, smooth(foreAirborne))
-  const foreY = u < 0.22 || u > 0.64 ? 0 : -6 * Math.sin(Math.PI * foreAirborne)
-  const paw = u < 0.22 || u > 0.64 ? PAW : lerp(PAW, 4, Math.sin(Math.PI * foreAirborne))
   // World positions into the body's own frame, which faces `facing`.
   const local = (world: number) => (world - x) * facing
+  // Feet are given as x along the body and height above the ground; a point
+  // carried with the body sits `drop` px below the body's own height.
+  const carried = (drop: number) => y - drop
+  // Hind feet: planted on the toes, heels rising, until lift-off; stretched
+  // out behind in flight; swung forward under the body to land in the crouch.
+  const liftOff = 0.3
+  const stretched = 0.6
+  const landed = 0.8
+  const hind = (toe: Vec): Foot => {
+    const planted = { at: v(local(from) + toe.x, 0), angle: u < 0.16 ? FLAT : lerp(FLAT, 72, span(u, 0.16, liftOff)) }
+    if (u < liftOff) return planted
+    const back = { at: v(toe.x - 25, carried(6)), angle: 172 }
+    if (u < stretched) {
+      const p = smooth(span(u, liftOff, stretched))
+      return { at: v(lerp(planted.at.x, back.at.x, p), lerp(0, back.at.y, p)), angle: lerp(72, back.angle, p) }
+    }
+    const down = { at: v(toe.x, 0), angle: FLAT }
+    if (u < landed) {
+      const p = smooth(span(u, stretched, landed))
+      return { at: v(lerp(back.at.x, down.at.x, p), lerp(back.at.y, 0, p) - 2 * Math.sin(Math.PI * p)), angle: lerp(back.angle, FLAT, p) }
+    }
+    return down
+  }
+  // Front paws: lift as the body rises, reach ahead through the flight, and
+  // land first, where the hop ends, the body rocking over them.
+  const foreLift = 0.22
+  const foreLand = 0.64
+  const fore = (toe: Vec): Foot => {
+    if (u < foreLift) return { at: v(local(from) + toe.x, 0), angle: PAW }
+    if (u >= foreLand) return { at: v(local(to) + toe.x, 0), angle: PAW }
+    const p = span(u, foreLift, foreLand)
+    const reach = { at: v(toe.x + 5, carried(4)), angle: 20 }
+    if (p < 0.5) {
+      const q = smooth(p / 0.5)
+      return { at: v(lerp(local(from) + toe.x, reach.at.x, q), lerp(0, reach.at.y, q)), angle: lerp(PAW, reach.angle, q) }
+    }
+    const q = smooth((p - 0.5) / 0.5)
+    return { at: v(lerp(reach.at.x, local(to) + toe.x, q), lerp(reach.at.y, 0, q)), angle: lerp(reach.angle, PAW, q) }
+  }
   const feet: Record<LegName, Foot> = {
-    nh: { at: v(local(hindWorld) + toeOf('nh').x, hindY), angle: heel },
-    fh: { at: v(local(hindWorld) + toeOf('fh').x, hindY * 0.9), angle: heel },
-    nf: { at: v(local(foreWorld) + toeOf('nf').x, foreY), angle: paw },
-    ff: { at: v(local(foreWorld) + toeOf('ff').x - 1.2, foreY * 0.9), angle: paw },
+    nh: hind(toeOf('nh')),
+    fh: hind(toeOf('fh')),
+    nf: fore(toeOf('nf')),
+    ff: fore(v(toeOf('ff').x - 1.2, 0)),
   }
   const ears = u < 0.16 ? 6 * span(u, 0, 0.16) : u < 0.5 ? lerp(6, -30, span(u, 0.16, 0.5)) : u < 0.74 ? lerp(-30, 16, span(u, 0.5, 0.74)) : lerp(16, 0, span(u, 0.74, 1))
   const spine = Math.sin(Math.PI * span(u, 0.18, 0.62))
